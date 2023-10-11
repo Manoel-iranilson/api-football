@@ -26,7 +26,7 @@ export class UserService {
     return user;
   }
 
-  remove(id: number) {
+  remove(id: string) {
     return `This action removes a #${id} user`;
   }
 }
