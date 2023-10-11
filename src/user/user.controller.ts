@@ -1,7 +1,35 @@
-import { Controller, Get, Post, Body, Delete, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Delete,
+  Param,
+  Request,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { IsPublic } from 'src/auth/decorators/is-public.decorator';
+import { AuthRequest } from 'src/auth/models/AuthRequest';
+import { FileInterceptor } from '@nestjs/platform-express';
+import path = require('path');
+import { v4 as uuidv4 } from 'uuid';
+import { diskStorage } from 'multer';
+
+export const storage = {
+  storage: diskStorage({
+    destination: './uploads/profileimages',
+    filename: (req, file, cb) => {
+      const filename: string =
+        path.parse(file.originalname).name.replace(/\s/g, '') + uuidv4();
+      const extension: string = path.parse(file.originalname).ext;
+
+      cb(null, `${filename}${extension}`);
+    },
+  }),
+};
 
 @Controller('user')
 export class UserController {
@@ -16,6 +44,17 @@ export class UserController {
   @Get()
   findByEmail(@Body() data: { email: string }) {
     return this.userService.findByEmail(data.email);
+  }
+
+  @Post('uploadImage')
+  @UseInterceptors(FileInterceptor('file', storage))
+  uploadImageUser(
+    @UploadedFile() file: Express.Multer.File,
+    @Request() req: AuthRequest,
+  ) {
+    return this.userService.uploadImage(req.user, {
+      profileImage: file.filename,
+    });
   }
 
   @Delete(':id')
