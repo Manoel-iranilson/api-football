@@ -5,6 +5,8 @@ import { PrismaService } from 'src/database/prisma.service';
 import { Prisma } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { User } from './entities/user.entity';
+import { createClient } from '@supabase/supabase-js';
+import { env } from 'process';
 
 @Injectable()
 export class UserService {
@@ -23,21 +25,35 @@ export class UserService {
     };
   }
 
-  async findByEmail(email: any) {
+  async findByEmail(email: string) {
     const user = this.prisma.user.findUnique({ where: { email } });
     return user;
   }
 
-  uploadImage(user: User, arg1: { profileImage: string }) {
-    const date = this.prisma.user.update({
+  async uploadImage(user: User, profileImage: Express.Multer.File) {
+    const supabaseURL = env.SUPABASE_URL;
+    const supabaseKey = env.SUPABASE_KEY;
+    const supabase = createClient(supabaseURL, supabaseKey, {
+      auth: {
+        persistSession: false,
+      },
+    });
+    const data = await supabase.storage
+      .from('profileImage')
+      .upload(profileImage.originalname, profileImage.buffer, { upsert: true });
+
+    const mongoData = this.prisma.user.update({
       data: {
         email: user.email,
         password: user.password,
-        imageUser: arg1.profileImage,
+        imageUser:
+          env.SUPABASE_URL +
+          '/storage/v1/object/public/profileImage/' +
+          data.data.path,
       },
       where: { id: user.id.toString() },
     });
-    return date;
+    return mongoData;
   }
 
   async remove(id: string) {

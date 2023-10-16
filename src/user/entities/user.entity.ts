@@ -2,5 +2,5 @@ export class User {
   id?: number;
   email: string;
   password: string;
-  profileImage?: string;
+  imageUser: string;
 }

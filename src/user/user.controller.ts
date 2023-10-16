@@ -8,6 +8,8 @@ import {
   Request,
   UploadedFile,
   UseInterceptors,
+  ParseFilePipe,
+  FileTypeValidator,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -47,14 +49,20 @@ export class UserController {
   }
 
   @Post('uploadImage')
-  @UseInterceptors(FileInterceptor('file', storage))
+  @UseInterceptors(FileInterceptor('file'))
   uploadImageUser(
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          // new MaxFileSizeValidator({ maxSize: 1000 }),
+          new FileTypeValidator({ fileType: 'image/jpeg' }),
+        ],
+      }),
+    )
+    file: Express.Multer.File,
     @Request() req: AuthRequest,
   ) {
-    return this.userService.uploadImage(req.user, {
-      profileImage: file.filename,
-    });
+    return this.userService.uploadImage(req.user, file);
   }
 
   @IsPublic()

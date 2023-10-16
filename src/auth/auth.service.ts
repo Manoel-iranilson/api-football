@@ -13,6 +13,7 @@ export class AuthService {
   ) {}
   async validateUser(email: string, password: string) {
     const user = await this.userService.findByEmail(email);
+
     if (user) {
       const isPassWordValue = await bcrypt.compare(password, user.password);
       if (isPassWordValue) {
@@ -25,7 +26,9 @@ export class AuthService {
     const payload: IPayload = {
       sub: user.id,
       email: user.email,
+      imageUser: user.imageUser,
     };
+
     const token = this.jwtService.sign(payload);
     return { access_token: token };
   }
