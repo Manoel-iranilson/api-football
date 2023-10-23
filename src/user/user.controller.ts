@@ -9,7 +9,6 @@ import {
   UploadedFile,
   UseInterceptors,
   ParseFilePipe,
-  FileTypeValidator,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -55,7 +54,7 @@ export class UserController {
       new ParseFilePipe({
         validators: [
           // new MaxFileSizeValidator({ maxSize: 1000 }),
-          new FileTypeValidator({ fileType: 'image/jpeg' }),
+          // new FileTypeValidator({ fileType: 'image/jpeg' }),
         ],
       }),
     )
