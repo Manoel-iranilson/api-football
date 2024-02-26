@@ -13,3 +13,22 @@ model User {
   password  String
   imageUser String?
 }
+
+model League {
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  name        String @unique
+  country     String
+  numberTeams Int
+  teams       Team[]
+}
+
+model Team {
+  id           String  @id @default(auto()) @map("_id") @db.ObjectId
+  fullName     String
+  name         String
+  country      String
+  abbreviation String?
+  image        String?
+  League       League? @relation(fields: [leagueId], references: [id])
+  leagueId     String? @db.ObjectId
+}
