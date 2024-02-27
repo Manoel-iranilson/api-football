@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Param,
@@ -8,16 +9,30 @@ import {
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
-import { IsPublic } from 'src/auth/decorators/is-public.decorator';
+
 import { TeamService } from './team.service';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { IsPublic } from 'src/auth/decorators/is-public.decorator';
 
 @Controller('team')
 export class TeamController {
   constructor(private readonly teamService: TeamService) {}
 
   @IsPublic()
+  @Get()
+  @HttpCode(HttpStatus.OK)
+  getTeams() {
+    return this.teamService.getTeams();
+  }
+
+  @IsPublic()
+  @Get(':id')
+  @HttpCode(HttpStatus.OK)
+  getTeam(@Param('id') id: string) {
+    return this.teamService.getTeam(id);
+  }
+
   @Post()
   @HttpCode(HttpStatus.OK)
   // @UseGuards(LocalTeamGuard)
@@ -25,7 +40,6 @@ export class TeamController {
     return this.teamService.createTeam(createTeamDto);
   }
 
-  @IsPublic()
   @Post('uploadImage/:id')
   @UseInterceptors(FileInterceptor('file'))
   uploadImageUser(

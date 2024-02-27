@@ -16,16 +16,21 @@ export class LeagueController {
   constructor(private readonly leagueService: LeagueService) {}
 
   @IsPublic()
-  @Post()
-  @HttpCode(HttpStatus.OK)
-  // @UseGuards(LocalTeamGuard)
-  createLeague(@Body() createLeagueDto: CreateLeagueDto) {
-    return this.leagueService.createLeague(createLeagueDto);
+  @Get()
+  getLeagues() {
+    return this.leagueService.getLeagues();
   }
 
   @IsPublic()
   @Get(':id')
   getLeague(@Param('id') id: string) {
     return this.leagueService.getLeague(id);
+  }
+
+  @Post()
+  @HttpCode(HttpStatus.OK)
+  // @UseGuards(LocalTeamGuard)
+  createLeague(@Body() createLeagueDto: CreateLeagueDto) {
+    return this.leagueService.createLeague(createLeagueDto);
   }
 }

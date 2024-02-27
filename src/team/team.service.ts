@@ -8,6 +8,20 @@ import { createClient } from '@supabase/supabase-js';
 export class TeamService {
   constructor(private prisma: PrismaService) {}
 
+  async getTeams() {
+    const teams = await this.prisma.team.findMany();
+
+    return teams;
+  }
+  async getTeam(id: string) {
+    const team = await this.prisma.team.findFirst({
+      where: { id },
+      include: { League: true },
+    });
+
+    return team;
+  }
+
   async createTeam(createTeamDto: CreateTeamDto) {
     const league = this.prisma.league.findFirst({
       where: { id: createTeamDto.leagueId },

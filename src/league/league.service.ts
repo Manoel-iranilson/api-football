@@ -17,6 +17,10 @@ export class LeagueService {
     });
   }
 
+  async getLeagues() {
+    return this.prisma.league.findMany({ include: { teams: true } });
+  }
+
   async getLeague(id: string) {
     return this.prisma.league.findFirst({
       where: { id },
